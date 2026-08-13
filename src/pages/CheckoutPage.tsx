@@ -39,6 +39,7 @@ export default function CheckoutPage() {
     totalPrice,
     isLoading,
     fetchBasket,
+    clearBasket,
   } = useBasketStore();
   const { showError } = useToast();
 
@@ -72,6 +73,7 @@ export default function CheckoutPage() {
         showError('La solicitud ya había sido registrada: se devolvió la orden existente (idempotencia).');
       }
       clearIdempotencyKey();
+      await clearBasket();
     } catch (err) {
       const message =
         (err as { response?: { data?: { detail?: string; title?: string } } })?.response?.data?.detail
@@ -82,7 +84,7 @@ export default function CheckoutPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [items.length, userName, showError]);
+  }, [items.length, userName, showError, clearBasket]);
 
   if (isLoading && items.length === 0) {
     return (
