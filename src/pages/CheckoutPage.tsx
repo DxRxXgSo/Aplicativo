@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useBasketStore } from '../store/basketStore';
-import { createOrder } from '../api/orders';
+import { createOrder, getTicketUrl, getCustomerTicketsUrl } from '../api/orders';
 import type { Order } from '../api/orders';
 import { useToast } from '../components/Toast';
 
@@ -159,6 +159,25 @@ export default function CheckoutPage() {
           </div>
 
           <div className="flex gap-3 justify-center">
+            <a
+              href={getTicketUrl(order.id)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-lg transition-colors inline-flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+              </svg>
+              Descargar ticket PDF
+            </a>
+            <a
+              href={getCustomerTicketsUrl(order.customerId)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 px-6 py-2.5 rounded-lg transition-colors"
+            >
+              Resumen de mis compras
+            </a>
             <Link
               to="/products"
               className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-lg transition-colors"

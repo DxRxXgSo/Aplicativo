@@ -1,4 +1,5 @@
 import type { Order, OrderStatus } from '../api/orders';
+import { getTicketUrl } from '../api/orders';
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
   Pending: 'bg-warning/10 text-warning border-warning/30',
@@ -60,14 +61,28 @@ export default function OrderCard({ order, showCustomer = false }: { order: Orde
           <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
           <span>${order.subtotal.toFixed(2)}</span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-gray-500 dark:text-gray-400">Impuestos (16%)</span>
-          <span>${order.tax.toFixed(2)}</span>
-        </div>
+        <div className="flex items-center justify-between">
+        <span className="text-gray-500 dark:text-gray-400 text-sm">Impuestos (16%)</span>
+        <span>${order.tax.toFixed(2)}</span>
+      </div>
         <div className="flex justify-between text-lg font-bold">
           <span>Total</span>
           <span>${order.total.toFixed(2)}</span>
         </div>
+      </div>
+
+      <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+        <a
+          href={getTicketUrl(order.id)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary-hover font-medium"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+          </svg>
+          Descargar ticket PDF
+        </a>
       </div>
     </div>
   );

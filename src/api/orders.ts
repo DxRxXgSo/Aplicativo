@@ -62,3 +62,11 @@ export const updateOrderStatus = async (
   const { data } = await ordersClient.patch(`/orders/${encodeURIComponent(id)}/status`, { status });
   return data;
 };
+
+const pdfApiUrl = import.meta.env.VITE_PDF_API_URL ?? 'http://localhost:8084';
+
+export const getTicketUrl = (orderId: string): string =>
+  `${pdfApiUrl}/api/tickets/${encodeURIComponent(orderId)}`;
+
+export const getCustomerTicketsUrl = (customerId: string): string =>
+  `${pdfApiUrl}/api/tickets/customer/${encodeURIComponent(customerId)}`;
