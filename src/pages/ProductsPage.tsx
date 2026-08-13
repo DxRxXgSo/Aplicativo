@@ -71,8 +71,9 @@ export default function ProductsPage() {
     try {
       await addItem(product);
       showSuccess(`${product.name} agregado al carrito`);
-    } catch {
-      showError('Error al agregar al carrito');
+    } catch (err) {
+      const message = (err as Error)?.message ?? 'Error al agregar al carrito';
+      showError(message);
     }
   };
 

@@ -9,6 +9,7 @@ export interface Product {
   imageFiles?: string;
   imageUrl?: string;
   price: number;
+  stock?: number;
 }
 
 export interface CreateProductRequest {
@@ -18,6 +19,7 @@ export interface CreateProductRequest {
   imagesFiles: string;
   imageUrl?: string;
   price: number;
+  stock?: number;
 }
 
 export interface PaginatedResponse<T> {

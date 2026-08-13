@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useBasketStore } from '../store/basketStore';
 import { BasketTableSkeleton } from '../components/Skeleton';
 import { useToast } from '../components/Toast';
@@ -25,6 +26,7 @@ export default function BasketPage() {
     clearBasket,
   } = useBasketStore();
   const { showSuccess, showError } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchBasket();
@@ -164,7 +166,10 @@ export default function BasketPage() {
                 <span>Total</span>
                 <span>${totalPrice.toFixed(2)}</span>
               </div>
-              <button className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-lg mt-6 transition-colors font-medium">
+              <button
+                onClick={() => navigate('/checkout')}
+                className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-lg mt-6 transition-colors font-medium"
+              >
                 Proceder al pago
               </button>
             </div>

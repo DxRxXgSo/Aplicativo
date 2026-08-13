@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { BasketItem, getBasket, storeBasket, deleteBasket } from '../api/basket';
 import type { Product } from '../api/products';
 
-const USER_NAME = 'comprador1';
+const DEFAULT_USER_NAME = 'comprador1';
 
 const calculateTotals = (items: BasketItem[]) => {
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -15,12 +15,14 @@ const calculateTotals = (items: BasketItem[]) => {
 };
 
 interface BasketState {
+  userName: string;
   items: BasketItem[];
   totalItems: number;
   totalPrice: number;
   isLoading: boolean;
   error: string | null;
 
+  setUserName: (userName: string) => void;
   fetchBasket: () => Promise<void>;
   addItem: (product: Product, quantity?: number, color?: string) => Promise<void>;
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
@@ -31,37 +33,56 @@ interface BasketState {
 export const useBasketStore = create<BasketState>()(
   persist(
     (set, get) => ({
+      userName: DEFAULT_USER_NAME,
       items: [],
       totalItems: 0,
       totalPrice: 0,
       isLoading: false,
       error: null,
 
+      setUserName: (userName) => {
+        const normalized = userName.trim().replace(/\s+/g, '_') || DEFAULT_USER_NAME;
+        if (normalized === get().userName) return;
+        set({ userName: normalized });
+        void get().fetchBasket();
+      },
+
       fetchBasket: async () => {
+        const { userName } = get();
         set({ isLoading: true, error: null });
         try {
-          const basket = await getBasket(USER_NAME);
+          const basket = await getBasket(userName);
           if (basket && basket.items) {
             const { totalItems, totalPrice } = calculateTotals(basket.items);
             set({ items: basket.items, totalItems, totalPrice, isLoading: false });
+          } else {
+            set({ items: [], totalItems: 0, totalPrice: 0, isLoading: false });
           }
         } catch {
-          set({ isLoading: false });
+          set({ items: [], totalItems: 0, totalPrice: 0, isLoading: false });
         }
       },
 
       addItem: async (product: Product, quantity = 1, color = '') => {
-        const { items: previousItems, totalItems: previousTotalItems, totalPrice: previousTotalPrice } = get();
+        const { userName, items: previousItems, totalItems: previousTotalItems, totalPrice: previousTotalPrice } = get();
         set({ isLoading: true, error: null });
 
         try {
           const imageFile = product.imageFile || product.imageFiles || product.imageUrl || 'product-1.png';
           const imageUrl = product.imageUrl || '';
           const category = Array.isArray(product.category) ? product.category[0] || '' : product.category || '';
+          const effectiveColor = color || category;
 
           const existingIndex = previousItems.findIndex(
-            (item) => item.productId === product.id && item.color === color
+            (item) => item.productId === product.id && item.color === effectiveColor
           );
+          const currentQuantity = existingIndex >= 0 ? previousItems[existingIndex].quantity : 0;
+
+          if (product.stock !== undefined && currentQuantity + quantity > product.stock) {
+            throw new Error(
+              `No hay stock suficiente de "${product.name}": solo hay ${product.stock} disponible(s).`
+            );
+          }
 
           let newItems: BasketItem[];
           if (existingIndex >= 0) {
@@ -76,7 +97,7 @@ export const useBasketStore = create<BasketState>()(
               productName: product.name,
               price: product.price,
               quantity,
-              color: color || category,
+              color: effectiveColor,
               imageFile,
               imageUrl,
             };
@@ -86,7 +107,7 @@ export const useBasketStore = create<BasketState>()(
           const totals = calculateTotals(newItems);
           set({ items: newItems, ...totals, isLoading: false });
 
-          await storeBasket(USER_NAME, newItems);
+          await storeBasket(userName, newItems);
         } catch (error) {
           set({
             items: previousItems,
@@ -100,7 +121,7 @@ export const useBasketStore = create<BasketState>()(
       },
 
       updateQuantity: async (productId: string, quantity: number) => {
-        const { items: previousItems } = get();
+        const { userName, items: previousItems } = get();
         set({ isLoading: true, error: null });
 
         try {
@@ -113,7 +134,7 @@ export const useBasketStore = create<BasketState>()(
           const totals = calculateTotals(newItems);
           set({ items: newItems, ...totals, isLoading: false });
 
-          await storeBasket(USER_NAME, newItems);
+          await storeBasket(userName, newItems);
         } catch (error) {
           set({ items: previousItems, error: 'Error al actualizar cantidad', isLoading: false });
           throw error;
@@ -121,7 +142,7 @@ export const useBasketStore = create<BasketState>()(
       },
 
       removeItem: async (productId: string) => {
-        const { items: previousItems } = get();
+        const { userName, items: previousItems } = get();
         set({ isLoading: true, error: null });
 
         try {
@@ -130,9 +151,9 @@ export const useBasketStore = create<BasketState>()(
           set({ items: newItems, ...totals, isLoading: false });
 
           if (newItems.length === 0) {
-            await deleteBasket(USER_NAME);
+            await deleteBasket(userName);
           } else {
-            await storeBasket(USER_NAME, newItems);
+            await storeBasket(userName, newItems);
           }
         } catch (error) {
           set({ items: previousItems, error: 'Error al eliminar del carrito', isLoading: false });
@@ -141,12 +162,12 @@ export const useBasketStore = create<BasketState>()(
       },
 
       clearBasket: async () => {
-        const { items: previousItems } = get();
+        const { userName, items: previousItems } = get();
         set({ isLoading: true, error: null });
 
         try {
           set({ items: [], totalItems: 0, totalPrice: 0, isLoading: false });
-          await deleteBasket(USER_NAME);
+          await deleteBasket(userName);
         } catch (error) {
           set({ items: previousItems, error: 'Error al vaciar carrito', isLoading: false });
           throw error;
@@ -156,6 +177,7 @@ export const useBasketStore = create<BasketState>()(
     {
       name: 'basket-storage',
       partialize: (state) => ({
+        userName: state.userName,
         items: state.items,
         totalItems: state.totalItems,
         totalPrice: state.totalPrice,

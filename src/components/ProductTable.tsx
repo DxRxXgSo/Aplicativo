@@ -55,12 +55,22 @@ export default function ProductTable({ products, onEdit, onDelete, onAddToCart }
             <p className="text-xl font-bold text-primary mb-3">
               ${product.price.toFixed(2)}
             </p>
+            <p className="text-sm mb-3">
+              {product.stock !== undefined && product.stock > 0 ? (
+                <span className="text-success font-medium">Disponible: {product.stock}</span>
+              ) : product.stock === 0 ? (
+                <span className="text-danger font-medium">Agotado</span>
+              ) : (
+                <span className="text-gray-500 dark:text-gray-400">Disponible</span>
+              )}
+            </p>
             <div className="flex gap-2">
               <button
                 onClick={() => onAddToCart(product)}
-                className="flex-1 bg-primary hover:bg-primary-hover text-white py-2 rounded-lg text-sm transition-colors"
+                disabled={product.stock === 0}
+                className="flex-1 bg-primary hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 rounded-lg text-sm transition-colors"
               >
-                Agregar
+                {product.stock === 0 ? 'Agotado' : 'Agregar'}
               </button>
               <button
                 onClick={() => onEdit(product)}
