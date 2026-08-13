@@ -106,7 +106,7 @@ export default function CheckoutPage() {
           </div>
           <h1 className="text-2xl font-bold mb-2">¡Compra confirmada!</h1>
           <p className="text-gray-500 dark:text-gray-400 mb-6">
-            Tu orden fue registrada correctamente y se guardó en MongoDB Atlas.
+            Tu orden fue registrada correctamente y se guardó en MongoDB.
           </p>
 
           <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-6 text-left">
