@@ -76,13 +76,6 @@ export const useBasketStore = create<BasketState>()(
           const existingIndex = previousItems.findIndex(
             (item) => item.productId === product.id && item.color === effectiveColor
           );
-          const currentQuantity = existingIndex >= 0 ? previousItems[existingIndex].quantity : 0;
-
-          if (product.stock !== undefined && currentQuantity + quantity > product.stock) {
-            throw new Error(
-              `No hay stock suficiente de "${product.name}": solo hay ${product.stock} disponible(s).`
-            );
-          }
 
           let newItems: BasketItem[];
           if (existingIndex >= 0) {

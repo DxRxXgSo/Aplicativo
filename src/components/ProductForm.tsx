@@ -14,7 +14,6 @@ export default function ProductForm({ initial, onSubmit, onCancel }: ProductForm
   const [imageFile, setImageFile] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [price, setPrice] = useState('');
-  const [stock, setStock] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -27,7 +26,6 @@ export default function ProductForm({ initial, onSubmit, onCancel }: ProductForm
       setImageFile(initial.imageFile || initial.imageFiles || '');
       setImageUrl(initial.imageUrl || '');
       setPrice(String(initial.price || ''));
-      setStock(initial.stock !== undefined ? String(initial.stock) : '');
     }
   }, [initial]);
 
@@ -44,7 +42,6 @@ export default function ProductForm({ initial, onSubmit, onCancel }: ProductForm
         imagesFiles: imageFile.trim() || 'product-1.png',
         imageUrl: imageUrl.trim() || undefined,
         price: Number(price),
-        stock: stock === '' ? undefined : Number(stock),
       });
     } finally {
       setSubmitting(false);
@@ -120,18 +117,6 @@ export default function ProductForm({ initial, onSubmit, onCancel }: ProductForm
           required
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
           placeholder="99.99"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-1">Stock (cantidad disponible)</label>
-        <input
-          type="number"
-          min="0"
-          value={stock}
-          onChange={(e) => setStock(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-          placeholder="10"
         />
       </div>
 
