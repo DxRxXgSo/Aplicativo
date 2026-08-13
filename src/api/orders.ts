@@ -50,6 +50,11 @@ export const getOrdersByCustomer = async (customerId: string): Promise<Order[]> 
   return data;
 };
 
+export const getAllOrders = async (): Promise<Order[]> => {
+  const { data } = await ordersClient.get('/orders');
+  return data;
+};
+
 export const updateOrderStatus = async (
   id: string,
   status: OrderStatus

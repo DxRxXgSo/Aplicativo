@@ -48,6 +48,12 @@ export default function App() {
                 </span>
               )}
             </Link>
+            <Link to="/orders" className={`${isActive('/orders')} transition-colors`}>
+              Mis Pedidos
+            </Link>
+            <Link to="/orders/all" className={`${isActive('/orders/all')} transition-colors`}>
+              Todas las compras
+            </Link>
           </div>
         </div>
       </nav>
